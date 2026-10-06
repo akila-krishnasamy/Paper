@@ -570,19 +570,19 @@ export default function ResultsDashboard({ result, childInfo, onReset }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
           
-          {/* Alert 1: Severe Anemia */}
+          {/* Anaemia requires a labelled haemoglobin measurement model. */}
           <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>Severe Pediatric Anemia</span>
-              <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: (overall_risk === 'HIGH' ? '#ef444422' : '#eab30822'), color: (overall_risk === 'HIGH' ? '#ef4444' : '#eab308'), fontWeight: 700 }}>
-                {overall_risk === 'HIGH' ? 'High Vulnerability' : 'Moderate Watch'}
+              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>Pediatric Anaemia</span>
+              <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: '#64748b22', color: '#94a3b8', fontWeight: 700 }}>
+                Not Evaluated
               </span>
             </div>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4, margin: '0 0 0.5rem 0' }}>
-              Risk of Hemoglobin &lt; 7.0 g/dL. Malnourished children experience impaired erythropoiesis and tissue hypoxia.
+              No haemoglobin measurement or labelled anaemia outcome is available in this screening dataset.
             </p>
             <div style={{ fontSize: '0.72rem', color: '#a5b4fc' }}>
-              Action: Check conjunctiva/palms for pallor; prescribe daily Iron-Folic Acid syrup.
+              Action: Obtain a validated haemoglobin test and clinical assessment.
             </div>
           </div>
 
