@@ -29,6 +29,20 @@ app.get("/api/health", async (req, res) => {
 
 // All 4 Models Consensus Prediction Endpoint
 app.post(["/api/prediction/all", "/api/prediction/dual", "/api/prediction"], async (req, res) => {
+
+  // Anthropometric high-accuracy prediction endpoint
+  app.post("/api/prediction/anthropometric", async (req, res) => {
+    try {
+      const response = await axios.post(`${ML_SERVICE_URL}/predict/anthropometric`, req.body, {
+        timeout: 10000,
+        headers: { "Content-Type": "application/json" }
+      });
+      return res.status(200).json(response.data);
+    } catch (error) {
+      if (error.response) return res.status(error.response.status).json(error.response.data);
+      return res.status(503).json({ error: "ML Service Unavailable", message: "Unable to connect to the Python ML prediction service on port 5005." });
+    }
+  });
   try {
     const payload = req.body;
     const response = await axios.post(`${ML_SERVICE_URL}/predict`, payload, {

@@ -19,7 +19,9 @@ export default function App() {
     setLastSubmittedChild(formData);
 
     let endpoint = 'http://localhost:3000/api/prediction/all';
-    if (selectedModel === 'XGBoost') {
+    if (selectedModel === 'Anthropometric') {
+      endpoint = 'http://localhost:3000/api/prediction/anthropometric';
+    } else if (selectedModel === 'XGBoost') {
       endpoint = 'http://localhost:3000/api/prediction/xgboost';
     } else if (selectedModel === 'Transformer') {
       endpoint = 'http://localhost:3000/api/prediction/transformer';

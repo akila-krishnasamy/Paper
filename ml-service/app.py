@@ -10,6 +10,7 @@ from inference.xgboost_predict import get_xgboost_predictor
 from inference.dnn_predict import predict_dnn
 from inference.tabnet_predict import predict_tabnet
 from inference.ensemble_predict import predict_ensemble
+from inference.anthropometric_predict import predict_anthropometric
 from preprocessing.preprocessing import TARGET_CONDITIONS, ALL_FEATURES
 
 app = Flask(__name__)
@@ -95,6 +96,8 @@ def parse_child_input(data):
 
     return {
         "child_age_months": age,
+        "height_cm": float(data.get("height_cm", data.get("height", 85.0))),
+        "weight_kg": float(data.get("weight_kg", data.get("weight", 11.0))),
         "birth_weight": bw,
         "breastfeeding_duration": float(bf),
         "birth_order": birth_order,
@@ -184,6 +187,18 @@ def route_predict_ensemble():
             predict_dnn,
             get_transformer_predictor(),
         )
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/predict/anthropometric", methods=["POST"])
+def route_predict_anthropometric():
+    """Predict disease risk from current anthropometric measurements."""
+    try:
+        data = request.get_json(force=True)
+        input_dict = parse_child_input(data)
+        result = predict_anthropometric(input_dict)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

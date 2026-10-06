@@ -1,0 +1,97 @@
+{
+  "dataset": "stunting_wasting_dataset.csv",
+  "test_size": 20000,
+  "conditions": {
+    "Stunting": {
+      "accuracy": 0.998,
+      "classification_report": {
+        "0": {
+          "precision": 0.9989740301378647,
+          "recall": 0.9983978467059729,
+          "f1-score": 0.9986858553158755,
+          "support": 15604.0
+        },
+        "1": {
+          "precision": 0.9943246311010215,
+          "recall": 0.9963603275705186,
+          "f1-score": 0.9953414384729008,
+          "support": 4396.0
+        },
+        "accuracy": 0.99795,
+        "macro avg": {
+          "precision": 0.996649330619443,
+          "recall": 0.9973790871382457,
+          "f1-score": 0.9970136468943882,
+          "support": 20000.0
+        },
+        "weighted avg": {
+          "precision": 0.9979520922295666,
+          "recall": 0.99795,
+          "f1-score": 0.9979507524937897,
+          "support": 20000.0
+        }
+      }
+    },
+    "Wasting": {
+      "accuracy": 1.0,
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 15560.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 4440.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 20000.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 20000.0
+        }
+      }
+    },
+    "Malnutrition": {
+      "accuracy": 0.9984,
+      "classification_report": {
+        "0": {
+          "precision": 0.9988412514484357,
+          "recall": 0.9985932974762102,
+          "f1-score": 0.9987172590722887,
+          "support": 12085.0
+        },
+        "1": {
+          "precision": 0.997852993180096,
+          "recall": 0.9982312065698041,
+          "f1-score": 0.9980420640434535,
+          "support": 7915.0
+        },
+        "accuracy": 0.99845,
+        "macro avg": {
+          "precision": 0.9983471223142659,
+          "recall": 0.9984122520230072,
+          "f1-score": 0.9983796615578711,
+          "support": 20000.0
+        },
+        "weighted avg": {
+          "precision": 0.9984501482387402,
+          "recall": 0.99845,
+          "f1-score": 0.9984500506396271,
+          "support": 20000.0
+        }
+      }
+    }
+  },
+  "training_time_seconds": 6.65
+}

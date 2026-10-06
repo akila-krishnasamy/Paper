@@ -6,6 +6,8 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
     childName: 'Child #1042',
     child_age_months: '24',
     child_sex: 'Female',
+    height_cm: '85',
+    weight_kg: '11',
     birth_weight: '2.9',
     birth_size: 'Average',
     breastfeeding_duration: '18',
@@ -31,6 +33,8 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
         childName: 'Priya (High-Risk Screening)',
         child_age_months: '18',
         child_sex: 'Female',
+        height_cm: '76',
+        weight_kg: '8.5',
         birth_weight: '2.1',
         birth_size: 'Smaller than Average',
         breastfeeding_duration: '8',
@@ -52,6 +56,8 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
         childName: 'Aarav (Healthy Baseline)',
         child_age_months: '24',
         child_sex: 'Male',
+        height_cm: '88',
+        weight_kg: '13',
         birth_weight: '3.3',
         birth_size: 'Average',
         breastfeeding_duration: '20',
@@ -73,6 +79,8 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
         childName: 'Kavya (Borderline Profile)',
         child_age_months: '14',
         child_sex: 'Female',
+        height_cm: '78',
+        weight_kg: '9.5',
         birth_weight: '2.6',
         birth_size: 'Average',
         breastfeeding_duration: '12',
@@ -120,6 +128,8 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
     onSubmit({
       ...formData,
       child_age_months: parseFloat(formData.child_age_months),
+      height_cm: parseFloat(formData.height_cm),
+      weight_kg: parseFloat(formData.weight_kg),
       birth_weight: parseFloat(formData.birth_weight),
       breastfeeding_duration: parseFloat(formData.breastfeeding_duration),
       birth_order: parseFloat(formData.birth_order),
@@ -130,7 +140,7 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
     });
   };
 
-  const modelsList = ['Compare All', 'XGBoost', 'Transformer', 'DNN', 'TabNet'];
+  const modelsList = ['Compare All', 'Anthropometric', 'XGBoost', 'Transformer', 'DNN', 'TabNet'];
 
   return (
     <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '2rem' }}>
@@ -213,6 +223,17 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
               value={formData.childName}
               onChange={(e) => handleChange('childName', e.target.value)}
             />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+            <div className="form-group">
+              <label className="form-label">Current Height (cm)</label>
+              <input type="number" step="0.1" className="form-control" value={formData.height_cm} onChange={(e) => handleChange('height_cm', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Current Weight (kg)</label>
+              <input type="number" step="0.1" className="form-control" value={formData.weight_kg} onChange={(e) => handleChange('weight_kg', e.target.value)} />
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
