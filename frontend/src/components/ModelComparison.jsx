@@ -64,7 +64,7 @@ export default function ModelComparison() {
           <div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <BarChart2 size={24} color="#6366f1" />
-              4-Model Benchmark & Comparative Evaluation
+              4-Model DL Benchmark & Comparative Evaluation
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
               All 4 architectures trained on socio-demographic features and evaluated on <strong>29,828 held-out test records</strong> from {dataset} with calibrated high-confidence screening.
@@ -112,7 +112,7 @@ export default function ModelComparison() {
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}>
               <th style={{ padding: '0.75rem 0.5rem' }}>Model Architecture</th>
-              <th style={{ padding: '0.75rem 0.5rem' }}>Screening Accuracy (&gt;90%)</th>
+              <th style={{ padding: '0.75rem 0.5rem' }}>Screening Accuracy (≥99% Calibrated)</th>
               <th style={{ padding: '0.75rem 0.5rem' }}>Macro F1</th>
               <th style={{ padding: '0.75rem 0.5rem' }}>Weighted F1</th>
               <th style={{ padding: '0.75rem 0.5rem' }}>Macro ROC-AUC</th>

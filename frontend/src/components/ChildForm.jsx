@@ -188,7 +188,7 @@ export default function ChildForm({ onSubmit, loading, selectedModel, setSelecte
       {/* Model Selection Tabs */}
       <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
         <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.6rem' }}>
-          Selected AI Screening Model:
+          Selected DL Screening Model:
         </span>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {modelsList.map(m => (

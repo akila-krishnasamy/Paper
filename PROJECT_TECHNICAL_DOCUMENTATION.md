@@ -245,3 +245,107 @@ npm run dev
 
 > [!WARNING]
 > **Clinical Research Disclaimer**: This system provides AI-based malnutrition risk screening for academic and research purposes and is **not a medical diagnosis**. Any child identified as Moderate or High risk should immediately be referred to a qualified pediatrician or public health worker (ANM/ICDS) for clinical anthropometric assessment, clinical examination, and nutritional intervention.
+
+---
+
+## 10. Consolidated Technology Stack and Evaluation Results
+
+### 10.1 Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Programming language | Python 3 |
+| Data processing | pandas, NumPy |
+| DHS storage | Apache Parquet |
+| Preprocessing | scikit-learn `StandardScaler`, `LabelEncoder`, stratified train/validation/test splitting |
+| Tree model | XGBoost with `MultiOutputClassifier` |
+| Deep learning models | PyTorch DNN, FT-Transformer, and TabNet |
+| Explainability | SHAP TreeExplainer, input-gradient attribution, and TabNet attention masks |
+| ML API | Python Flask |
+| API gateway | Node.js Express |
+| Frontend | React 18 with Vite |
+| UI and icons | CSS and Lucide React |
+| Model serialization | Joblib and PyTorch model artifacts |
+| API testing | Python HTTP test client |
+
+### 10.2 DHS Features
+
+The DHS malnutrition models use 18 predictors.
+
+**Numerical predictors:** `child_age_months`, `birth_weight`,
+`breastfeeding_duration`, `birth_order`, `mother_bmi`, `anc_visits`,
+`hhsize`, `sanitation_risk_index`, and `maternal_risk_score`.
+
+**Categorical predictors:** `child_sex`, `education`, `wealth_quintile`,
+`residence`, `birth_size`, `diarrhea_recent`, `fever_recent`,
+`cough_recent`, and `measles_vaccine`.
+
+The sanitation-risk index is derived from water source, toilet type, and
+cooking fuel. The maternal-risk score combines maternal underweight,
+insufficient antenatal visits, and low birth weight.
+
+### 10.3 DHS Model Benchmark
+
+The DHS-derived dataset contains 198,849 records. The fixed-seed split is
+70% training (139,194), 15% validation (29,827), and 15% held-out testing
+(29,828). The validation set is used for calibration and threshold tuning;
+the test set is reserved for final reporting.
+
+| Model | Accuracy | Macro F1 | Weighted F1 | Macro ROC-AUC | Hamming loss | Training time |
+|---|---:|---:|---:|---:|---:|---:|
+| DNN | **94.85%** | **0.9390** | **0.9510** | **0.9520** | **0.0515** | 56.67 s |
+| FT-Transformer | 93.18% | 0.9234 | 0.9352 | 0.9380 | 0.0682 | 156.79 s |
+| XGBoost | 92.40% | 0.9142 | 0.9285 | 0.9315 | 0.0760 | **14.66 s** |
+| TabNet | 91.65% | 0.9082 | 0.9215 | 0.9245 | 0.0835 | 207.45 s |
+
+### 10.4 Best DHS Result by Target
+
+| Target | Best model | Accuracy | F1-score | ROC-AUC |
+|---|---|---:|---:|---:|
+| Stunting | DNN | **94.10%** | 0.9350 | 0.9480 |
+| Wasting | DNN | **95.60%** | 0.9475 | 0.9610 |
+| Composite malnutrition | DNN | **94.85%** | 0.9420 | 0.9520 |
+
+The DNN is the best overall accuracy model. XGBoost is the fastest model and
+provides the most direct tree-based SHAP explanations.
+
+### 10.5 Separate Anaemia Evaluation
+
+Anaemia was evaluated separately because the DHS file in this repository has
+no haemoglobin measurement or anaemia ground-truth label. The evaluation used
+the public [`anemia.csv`](https://github.com/ajay3789/Anemia-Dataset) dataset
+from `ajay3789/Anemia-Dataset`.
+
+The dataset contains 300 records and the binary `Result` target, where `0`
+represents non-anaemic and `1` represents anaemic. The predictors were
+`Gender`, `Hemoglobin`, `MCH`, `MCHC`, and `MCV`.
+
+The evaluated pipeline was a class-balanced Logistic Regression model with
+`StandardScaler`, a stratified 80/20 split, and random seed 42. The test set
+contained 60 records.
+
+| Metric | Result |
+|---|---:|
+| Test accuracy | **95.00%** |
+| Precision | 88.46% |
+| Sensitivity/recall | **100.00%** |
+| Specificity | 91.89% |
+| F1-score | 93.88% |
+| ROC-AUC | 100.00% |
+| Five-fold CV accuracy | **97.33% ± 1.70%** |
+
+Test confusion matrix:
+
+```text
+                Predicted
+              Normal  Anaemia
+Actual Normal   34       3
+Actual Anaemia   0      23
+```
+
+This is a separate haemoglobin/CBC-based anaemia evaluation, not DHS anaemia
+accuracy. The dataset is small and its population is not documented as the
+same as the DHS child population. The result must therefore not be presented
+as clinical validation or as evidence that the DHS model predicts anaemia.
+Anaemia integration requires a labelled, population-appropriate dataset and
+an independent held-out evaluation.

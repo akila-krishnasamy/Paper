@@ -88,7 +88,7 @@ export default function ResultsDashboard({ result, childInfo, onReset }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem' }}>
             <HeartPulse size={26} color="#6366f1" className="animate-spin-slow" />
             <h2 className="shimmer-text" style={{ fontSize: '1.45rem', fontWeight: 800 }}>
-              AI Pediatric Malnutrition Assessment
+              DL Pediatric Malnutrition Assessment
             </h2>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
@@ -268,7 +268,7 @@ export default function ResultsDashboard({ result, childInfo, onReset }) {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.75rem', color: 'var(--text-muted)', padding: '0 0.5rem' }}>
               <span>0% Low</span>
-              <span>50% Threshold</span>
+              <span style={{ color: '#38bdf8', fontWeight: 700 }}>99% Threshold</span>
               <span>100% Critical</span>
             </div>
           </div>

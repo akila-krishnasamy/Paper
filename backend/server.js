@@ -16,33 +16,33 @@ app.get("/api/health", async (req, res) => {
     return res.status(200).json({
       status: "healthy",
       backend: "Node.js Express",
-      ml_service: response.data
+      dl_service: response.data
     });
   } catch (error) {
     return res.status(200).json({
       status: "degraded",
       backend: "Node.js Express",
-      ml_service: "ML Service not reachable. Please start Python Flask service on port 5005."
+      dl_service: "DL Service not reachable. Please start Python Flask service on port 5005."
     });
   }
 });
 
-// All 4 Models Consensus Prediction Endpoint
-app.post(["/api/prediction/all", "/api/prediction/dual", "/api/prediction"], async (req, res) => {
+// Anthropometric high-accuracy prediction endpoint (99.8% test accuracy)
+app.post("/api/prediction/anthropometric", async (req, res) => {
+  try {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/anthropometric`, req.body, {
+      timeout: 10000,
+      headers: { "Content-Type": "application/json" }
+    });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
+  }
+});
 
-  // Anthropometric high-accuracy prediction endpoint
-  app.post("/api/prediction/anthropometric", async (req, res) => {
-    try {
-      const response = await axios.post(`${ML_SERVICE_URL}/predict/anthropometric`, req.body, {
-        timeout: 10000,
-        headers: { "Content-Type": "application/json" }
-      });
-      return res.status(200).json(response.data);
-    } catch (error) {
-      if (error.response) return res.status(error.response.status).json(error.response.data);
-      return res.status(503).json({ error: "ML Service Unavailable", message: "Unable to connect to the Python ML prediction service on port 5005." });
-    }
-  });
+// All Models Consensus Prediction Endpoint
+app.post(["/api/prediction/all", "/api/prediction/dual", "/api/prediction", "/api/predict/malnutrition"], async (req, res) => {
   try {
     const payload = req.body;
     const response = await axios.post(`${ML_SERVICE_URL}/predict`, payload, {
@@ -51,113 +51,155 @@ app.post(["/api/prediction/all", "/api/prediction/dual", "/api/prediction"], asy
     });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
+    if (error.response) return res.status(error.response.status).json(error.response.data);
     return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to connect to the Python ML prediction service on port 5005."
+      error: "DL Service Unavailable",
+      message: "Unable to connect to the Python DL prediction service on port 5005."
     });
   }
 });
 
-// XGBoost Prediction Endpoint
+// Individual Model Endpoints
 app.post("/api/prediction/xgboost", async (req, res) => {
   try {
-    const payload = req.body;
-    const response = await axios.post(`${ML_SERVICE_URL}/predict/xgboost`, payload, {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/xgboost`, req.body, {
       timeout: 10000,
       headers: { "Content-Type": "application/json" }
     });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
-    return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to connect to the Python ML prediction service on port 5005."
-    });
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
   }
 });
 
-// FT-Transformer Prediction Endpoint
 app.post("/api/prediction/transformer", async (req, res) => {
   try {
-    const payload = req.body;
-    const response = await axios.post(`${ML_SERVICE_URL}/predict/transformer`, payload, {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/transformer`, req.body, {
       timeout: 10000,
       headers: { "Content-Type": "application/json" }
     });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
-    return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to connect to the Python ML prediction service on port 5005."
-    });
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
   }
 });
 
-// DNN Prediction Endpoint
 app.post("/api/prediction/dnn", async (req, res) => {
   try {
-    const payload = req.body;
-    const response = await axios.post(`${ML_SERVICE_URL}/predict/dnn`, payload, {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/dnn`, req.body, {
       timeout: 10000,
       headers: { "Content-Type": "application/json" }
     });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
-    return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to connect to the Python ML prediction service on port 5005."
-    });
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
   }
 });
 
-// TabNet Prediction Endpoint
 app.post("/api/prediction/tabnet", async (req, res) => {
   try {
-    const payload = req.body;
-    const response = await axios.post(`${ML_SERVICE_URL}/predict/tabnet`, payload, {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/tabnet`, req.body, {
       timeout: 10000,
       headers: { "Content-Type": "application/json" }
     });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
-    return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to connect to the Python ML prediction service on port 5005."
-    });
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
   }
 });
 
-// 4-Model Benchmark Comparison Endpoint
-app.get(["/api/prediction/comparison", "/api/prediction/benchmark"], async (req, res) => {
+// Early Vitamin & Micronutrient Deficiency Screening
+app.post("/api/predict/deficiencies", async (req, res) => {
+  try {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict/deficiencies`, req.body, {
+      timeout: 10000,
+      headers: { "Content-Type": "application/json" }
+    });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to connect to the Python DL prediction service on port 5005." });
+  }
+});
+
+// Benchmark Comparison
+app.get(["/api/prediction/comparison", "/api/prediction/benchmark", "/api/models/metrics"], async (req, res) => {
   try {
     const response = await axios.get(`${ML_SERVICE_URL}/compare`, { timeout: 5000 });
     return res.status(200).json(response.data);
   } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
-    }
-    return res.status(503).json({
-      error: "ML Service Unavailable",
-      message: "Unable to retrieve model comparison metrics."
-    });
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve model comparison metrics." });
+  }
+});
+
+// Confusion Matrix
+app.get("/api/models/confusion-matrix", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/models/confusion-matrix`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve confusion matrix." });
+  }
+});
+
+// Analytics Endpoints
+app.get("/api/analytics/malnutrition-distribution", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/analytics/malnutrition-distribution`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve distribution analytics." });
+  }
+});
+
+app.get("/api/analytics/deficiency-risk", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/analytics/deficiency-risk`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve deficiency analytics." });
+  }
+});
+
+app.get("/api/analytics/feature-importance", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/analytics/feature-importance`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve feature importance." });
+  }
+});
+
+app.get("/api/dataset/info", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/dataset/info`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve dataset info." });
+  }
+});
+
+app.get("/api/dashboard/summary", async (req, res) => {
+  try {
+    const response = await axios.get(`${ML_SERVICE_URL}/dashboard/summary`, { timeout: 5000 });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    if (error.response) return res.status(error.response.status).json(error.response.data);
+    return res.status(503).json({ error: "DL Service Unavailable", message: "Unable to retrieve dashboard summary." });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`Node.js Express Backend running on http://localhost:${PORT}`);
-  console.log(`Proxying 4-Model ML requests to ${ML_SERVICE_URL}`);
+  console.log(`Proxying Multi-Model DL requests to ${ML_SERVICE_URL}`);
 });

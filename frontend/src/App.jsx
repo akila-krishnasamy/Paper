@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import ChildForm from './components/ChildForm';
 import ResultsDashboard from './components/ResultsDashboard';
 import ModelComparison from './components/ModelComparison';
-import { Activity, Shield, Cpu, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import DeficiencyScreening from './components/DeficiencyScreening';
+import AnalyticsCharts from './components/AnalyticsCharts';
+import { Activity, Shield, Cpu, RefreshCw, AlertCircle, Sparkles, Droplets, BarChart3 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('screening'); // 'screening' | 'comparison'
+  const [activeTab, setActiveTab] = useState('screening'); // 'screening' | 'deficiency' | 'comparison' | 'analytics'
   const [selectedModel, setSelectedModel] = useState('Compare All');
   const [loading, setLoading] = useState(false);
   const [predictionResult, setPredictionResult] = useState(null);
@@ -40,13 +42,13 @@ export default function App() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || errData.message || 'The AI prediction service encountered an issue.');
+        throw new Error(errData.error || errData.message || 'The DL prediction service encountered an issue.');
       }
 
       const result = await response.json();
       setPredictionResult(result);
     } catch (err) {
-      setApiError(err.message || 'Unable to connect to prediction backend server on port 3000.');
+      setApiError(err.message || 'Unable to connect to DL prediction backend server on port 3000.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ export default function App() {
       <header className="navbar">
         <div className="brand-logo">
           <Shield size={26} color="#6366f1" />
-          <span>NutriPredict AI — 4-Model Pediatric Malnutrition Suite</span>
+          <span>NutriPredict DL — 4-Model Pediatric Malnutrition & Deficiency Suite</span>
         </div>
 
         <nav className="nav-tabs">
@@ -78,11 +80,27 @@ export default function App() {
           </button>
           <button
             type="button"
+            className={`nav-tab-btn ${activeTab === 'deficiency' ? 'active' : ''}`}
+            onClick={() => setActiveTab('deficiency')}
+          >
+            <Droplets size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
+            Early Vitamin Deficiency Screening
+          </button>
+          <button
+            type="button"
             className={`nav-tab-btn ${activeTab === 'comparison' ? 'active' : ''}`}
             onClick={() => setActiveTab('comparison')}
           >
             <Cpu size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
-            4-Model Benchmark Comparison
+            4-Model DL Benchmark Comparison
+          </button>
+          <button
+            type="button"
+            className={`nav-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <BarChart3 size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
+            Analytics & Charts
           </button>
         </nav>
       </header>
@@ -104,7 +122,7 @@ export default function App() {
               <div className="glass-panel" style={{ padding: '1.5rem', marginTop: '1.5rem', borderColor: '#ef4444', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <AlertCircle size={28} color="#ef4444" />
                 <div>
-                  <h4 style={{ color: '#ef4444', fontWeight: 700 }}>Assessment Service Error</h4>
+                  <h4 style={{ color: '#ef4444', fontWeight: 700 }}>DL Assessment Service Error</h4>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{apiError}</p>
                 </div>
               </div>
@@ -120,18 +138,26 @@ export default function App() {
           </div>
         )}
 
+        {activeTab === 'deficiency' && (
+          <DeficiencyScreening />
+        )}
+
         {activeTab === 'comparison' && (
           <ModelComparison />
+        )}
+
+        {activeTab === 'analytics' && (
+          <AnalyticsCharts />
         )}
       </main>
 
       {/* Footer with Medical Disclaimer */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem 2rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
         <p>
-          <strong>Clinical Research Disclaimer:</strong> This system provides AI-based malnutrition risk screening for academic and research purposes and is not a medical diagnosis.
+          <strong>Clinical Research Disclaimer:</strong> This system provides DL-based malnutrition and micronutrient risk screening for academic and research purposes and is not a medical diagnosis.
         </p>
         <p style={{ marginTop: '0.35rem', color: 'var(--text-muted)' }}>
-          Powered by XGBoost, FT-Transformer, Deep Neural Network (DNN), and TabNet • Trained on NFHS-5 Survey Records
+          Powered by Deep Neural Network (DNN), FT-Transformer, XGBoost, and TabNet • Trained on NFHS-5 Survey Records
         </p>
       </footer>
 
