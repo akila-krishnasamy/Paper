@@ -1,0 +1,85 @@
+{
+  "task": "current nutritional status",
+  "not_comparable_to": "early-risk prediction",
+  "dataset_sha256": "ee9443fa3123b9039527a8d208c4108757227a84f2643732b08cc01feceb6c34",
+  "seed": 42,
+  "source_variables": [
+    "hw1",
+    "b4",
+    "hw2",
+    "hw3",
+    "hw5",
+    "hw8"
+  ],
+  "excluded_target_variables": [
+    "hw70",
+    "hw72"
+  ],
+  "split": {
+    "train": 139169,
+    "validation": 29910,
+    "test": 29760
+  },
+  "thresholds_selected_on_validation": [
+    0.4199999999999998,
+    0.47999999999999976
+  ],
+  "test_exact_match_accuracy": 0.9847782258064516,
+  "test_macro_f1": 0.9855323211960144,
+  "per_target": {
+    "Stunting": {
+      "accuracy": 0.9927083333333333,
+      "balanced_accuracy": 0.9929550336416999,
+      "precision": 0.9860042636018167,
+      "recall": 0.9938340807174888,
+      "f1": 0.9899036895733495
+    },
+    "Wasting": {
+      "accuracy": 0.9918346774193548,
+      "balanced_accuracy": 0.9864646684494199,
+      "precision": 0.9777777777777777,
+      "recall": 0.9779559118236473,
+      "f1": 0.9778668366882229
+    },
+    "Malnutrition": {
+      "accuracy": 0.9889112903225806,
+      "balanced_accuracy": 0.9889344068532424,
+      "precision": 0.9864216712828481,
+      "recall": 0.9912429570293938,
+      "f1": 0.9888264373264711
+    }
+  },
+  "confusion_matrices": {
+    "Stunting": [
+      [
+        18905,
+        151
+      ],
+      [
+        66,
+        10638
+      ]
+    ],
+    "Wasting": [
+      [
+        24149,
+        122
+      ],
+      [
+        121,
+        5368
+      ]
+    ],
+    "Malnutrition": [
+      [
+        14828,
+        201
+      ],
+      [
+        129,
+        14602
+      ]
+    ]
+  },
+  "training_seconds": 29.42372751235962
+}

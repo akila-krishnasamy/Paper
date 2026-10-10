@@ -7,11 +7,17 @@ import { BarChart3, PieChart, Activity, AlertCircle, RefreshCw, Layers, ShieldCh
 
 export default function AnalyticsCharts() {
   const [distributionData, setDistributionData] = useState([]);
-  const [benchmarkData, setBenchmarkData] = useState([]);
   const [importanceData, setImportanceData] = useState([]);
   const [cmData, setCmData] = useState(null);
   const [selectedCmModel, setSelectedCmModel] = useState('DNN');
   const [loading, setLoading] = useState(true);
+
+  const verifiedAccuracyData = [
+    { model: 'Early-risk DNN', accuracy: 52.62, baseline: 50.08 },
+    { model: 'Current-status DNN', accuracy: 98.03, baseline: null },
+    { model: 'NFHS-5 anemia DNN', accuracy: 67.20, baseline: 66.78 },
+    { model: 'NFHS-5 ARI DNN', accuracy: 97.70, baseline: 97.70 },
+  ];
 
   useEffect(() => {
     async function fetchData() {
@@ -38,20 +44,6 @@ export default function AnalyticsCharts() {
           setCmData(cm);
         }
 
-        // 4. Benchmark comparison
-        const resBench = await fetch('http://localhost:3000/api/prediction/comparison');
-        if (resBench.ok) {
-          const b = await resBench.json();
-          const summary = b.overall_summary || {};
-          const benchArr = Object.keys(summary).map(k => ({
-            model: k,
-            Accuracy: Number((summary[k].accuracy * 100).toFixed(1)),
-            MacroF1: Number((summary[k].macro_f1 * 100).toFixed(1)),
-            ROCAUC: Number((summary[k].macro_roc_auc * 100).toFixed(1)),
-            WeightedF1: Number((summary[k].weighted_f1 * 100).toFixed(1))
-          }));
-          setBenchmarkData(benchArr);
-        }
       } catch (err) {
         console.error('Failed to fetch analytics data:', err);
       } finally {
@@ -135,23 +127,22 @@ export default function AnalyticsCharts() {
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Layers size={18} color="#6366f1" />
-            Chart B: Deep Learning (DL) Model Performance Comparison (%)
+            Chart B: Verified DNN Accuracy by Prediction Task (%)
           </h3>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-            Held-out test split evaluation (29,828 records). DNN achieves top Macro ROC-AUC (95.2%).
+            Prediction-derived held-out results. Current-status and early-risk malnutrition are different tasks.
           </p>
 
           <div style={{ height: '300px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={benchmarkData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <BarChart data={verifiedAccuracyData} margin={{ top: 10, right: 20, left: 0, bottom: 55 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="model" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis domain={[85, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                <XAxis dataKey="model" interval={0} angle={-18} textAnchor="end" height={65} tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
                 <Legend />
-                <Bar dataKey="Accuracy" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="MacroF1" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="ROCAUC" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="accuracy" name="Test accuracy" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="baseline" name="Majority baseline" fill="#64748b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

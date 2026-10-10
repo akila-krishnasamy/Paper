@@ -1,0 +1,110 @@
+{
+  "target": "anemia",
+  "target_definition": "hw57 in {1,2,3}=anemia and 4=not anemia",
+  "raw_dataset": "data\\raw\\IAKR7EFL.DTA",
+  "dataset_sha256": "ee9443fa3123b9039527a8d208c4108757227a84f2643732b08cc01feceb6c34",
+  "seed": 42,
+  "features": [
+    "hw1",
+    "b4",
+    "b5",
+    "b8",
+    "b11",
+    "b12",
+    "b16",
+    "v024",
+    "v025",
+    "v106",
+    "v190"
+  ],
+  "excluded_target_variables": [
+    "hw57"
+  ],
+  "counts": {
+    "eligible": 183855,
+    "train": 128616,
+    "validation": 27659,
+    "test": 27580
+  },
+  "positive_counts": {
+    "all": 123462,
+    "train": 86366,
+    "validation": 18677,
+    "test": 18419
+  },
+  "thresholds_selected_on_validation": {
+    "xgboost": 0.49000000000000027,
+    "dnn": 0.3000000000000001,
+    "ft_transformer": 0.3000000000000001
+  },
+  "models": {
+    "xgboost": {
+      "n": 27580,
+      "accuracy": 0.6845902828136331,
+      "macro_f1": 0.5149958471852387,
+      "weighted_f1": 0.6112681682992049,
+      "precision": 0.6908127208480566,
+      "recall_sensitivity": 0.9552635865139258,
+      "specificity": 0.14037768802532474,
+      "roc_auc": 0.6696378107590844,
+      "pr_auc": 0.787978713464601,
+      "confusion_matrix": [
+        [
+          1286,
+          7875
+        ],
+        [
+          824,
+          17595
+        ]
+      ],
+      "majority_baseline_accuracy": 0.6678390137781001
+    },
+    "dnn": {
+      "n": 27580,
+      "accuracy": 0.6720449601160261,
+      "macro_f1": 0.4627159035638959,
+      "weighted_f1": 0.5752903099280912,
+      "precision": 0.677699423718532,
+      "recall_sensitivity": 0.9704652804169608,
+      "specificity": 0.07204453662263945,
+      "roc_auc": 0.6448367184237285,
+      "pr_auc": 0.7706156603027796,
+      "confusion_matrix": [
+        [
+          660,
+          8501
+        ],
+        [
+          544,
+          17875
+        ]
+      ],
+      "majority_baseline_accuracy": 0.6678390137781001
+    },
+    "ft_transformer": {
+      "n": 27580,
+      "accuracy": 0.678027556200145,
+      "macro_f1": 0.48865542222382125,
+      "weighted_f1": 0.5931124775355947,
+      "precision": 0.6838311813451532,
+      "recall_sensitivity": 0.9632444758130192,
+      "specificity": 0.10457373649164939,
+      "roc_auc": 0.6552693185294354,
+      "pr_auc": 0.7756335048282459,
+      "confusion_matrix": [
+        [
+          958,
+          8203
+        ],
+        [
+          677,
+          17742
+        ]
+      ],
+      "majority_baseline_accuracy": 0.6678390137781001
+    }
+  },
+  "created_unix": 1791602052.1282632,
+  "training_seconds": 227.495676279068
+}
