@@ -1,0 +1,275 @@
+{
+  "model_name": "DNN retrained reproducibly",
+  "run_id": "dnn_retrained_seed42",
+  "dataset_sha256": "4215d66720c761695eb7f029962c4ebb5d0df5cf40c336a8fc0bc9e803a04abf",
+  "split_seed": 42,
+  "sample_counts": {
+    "train": 139194,
+    "validation": 29827,
+    "test": 29828
+  },
+  "features": [
+    "child_age_months",
+    "birth_weight",
+    "breastfeeding_duration",
+    "birth_order",
+    "mother_bmi",
+    "anc_visits",
+    "hhsize",
+    "sanitation_risk_index",
+    "maternal_risk_score",
+    "child_sex",
+    "education",
+    "wealth_quintile",
+    "residence",
+    "birth_size",
+    "diarrhea_recent",
+    "fever_recent",
+    "cough_recent",
+    "measles_vaccine"
+  ],
+  "targets": [
+    "Stunting",
+    "Wasting",
+    "Malnutrition"
+  ],
+  "thresholds_selected_on_validation": {
+    "Stunting": 0.4999999999999998,
+    "Wasting": 0.4999999999999998,
+    "Malnutrition": 0.5299999999999998
+  },
+  "validation_metrics": {
+    "exact_match_accuracy": 0.4076843128708888,
+    "hamming_accuracy": 0.6899565270839619,
+    "macro_f1": 0.3069597511530657,
+    "weighted_f1": 0.3927777791995338,
+    "macro_precision": 0.39020732395198604,
+    "macro_recall": 0.26321618700220295,
+    "macro_roc_auc": 0.6322583383594608,
+    "macro_pr_auc": 0.4615843059196552,
+    "per_target": {
+      "Stunting": {
+        "accuracy": 0.656150467697053,
+        "precision": 0.5546509261143904,
+        "recall_sensitivity": 0.25247845825998333,
+        "specificity": 0.8850478091835663,
+        "f1": 0.34700114605883103,
+        "roc_auc": 0.6558610206816728,
+        "pr_auc": 0.5023858198439963,
+        "support_positive": 10793,
+        "support_total": 29827
+      },
+      "Wasting": {
+        "accuracy": 0.8119824320246757,
+        "precision": 0.0,
+        "recall_sensitivity": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "roc_auc": 0.5972506716087316,
+        "pr_auc": 0.2508065534269352,
+        "support_positive": 5608,
+        "support_total": 29827
+      },
+      "Malnutrition": {
+        "accuracy": 0.6017366815301572,
+        "precision": 0.6159710457415678,
+        "recall_sensitivity": 0.5371701027466255,
+        "specificity": 0.6661087305838244,
+        "f1": 0.5738781074003659,
+        "roc_auc": 0.643663322787978,
+        "pr_auc": 0.6315605444880341,
+        "support_positive": 14891,
+        "support_total": 29827
+      }
+    },
+    "confusion_matrices": {
+      "Stunting": [
+        [
+          16846,
+          2188
+        ],
+        [
+          8068,
+          2725
+        ]
+      ],
+      "Wasting": [
+        [
+          24219,
+          0
+        ],
+        [
+          5608,
+          0
+        ]
+      ],
+      "Malnutrition": [
+        [
+          9949,
+          4987
+        ],
+        [
+          6892,
+          7999
+        ]
+      ]
+    }
+  },
+  "training_metrics": {
+    "exact_match_accuracy": 0.4111024900498585,
+    "hamming_accuracy": 0.6922209290630343,
+    "macro_f1": 0.30974580573880456,
+    "weighted_f1": 0.39693973174646047,
+    "macro_precision": 0.3924392886246597,
+    "macro_recall": 0.2660007369296669,
+    "macro_roc_auc": 0.6412795673804511,
+    "macro_pr_auc": 0.4681195500974303,
+    "per_target": {
+      "Stunting": {
+        "accuracy": 0.6569176832334727,
+        "precision": 0.5565356509707269,
+        "recall_sensitivity": 0.25552908477268216,
+        "specificity": 0.8845357110690805,
+        "f1": 0.35024558825530294,
+        "roc_auc": 0.6579871771998086,
+        "pr_auc": 0.5051109789081235,
+        "support_positive": 50370,
+        "support_total": 139194
+      },
+      "Wasting": {
+        "accuracy": 0.8135982872824978,
+        "precision": 0.0,
+        "recall_sensitivity": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "roc_auc": 0.6166945450853466,
+        "pr_auc": 0.2648415775254921,
+        "support_positive": 25946,
+        "support_total": 139194
+      },
+      "Malnutrition": {
+        "accuracy": 0.6061468166731324,
+        "precision": 0.6207822149032524,
+        "recall_sensitivity": 0.5424731260163187,
+        "specificity": 0.6696268453294694,
+        "f1": 0.5789918289611108,
+        "roc_auc": 0.6491569798561981,
+        "pr_auc": 0.6344060938586752,
+        "support_positive": 69491,
+        "support_total": 139194
+      }
+    },
+    "confusion_matrices": {
+      "Stunting": [
+        [
+          78568,
+          10256
+        ],
+        [
+          37499,
+          12871
+        ]
+      ],
+      "Wasting": [
+        [
+          113248,
+          0
+        ],
+        [
+          25946,
+          0
+        ]
+      ],
+      "Malnutrition": [
+        [
+          46675,
+          23028
+        ],
+        [
+          31794,
+          37697
+        ]
+      ]
+    }
+  },
+  "final_test_metrics": {
+    "exact_match_accuracy": 0.41219659380447904,
+    "hamming_accuracy": 0.6911179652228332,
+    "macro_f1": 0.30803450205804545,
+    "weighted_f1": 0.3937216436151324,
+    "macro_precision": 0.3911364109659993,
+    "macro_recall": 0.263688738007454,
+    "macro_roc_auc": 0.6345302212627076,
+    "macro_pr_auc": 0.46193126288025343,
+    "per_target": {
+      "Stunting": {
+        "accuracy": 0.6582070537749766,
+        "precision": 0.5536220153783893,
+        "recall_sensitivity": 0.2551048951048951,
+        "specificity": 0.8845207559022144,
+        "f1": 0.349269164485862,
+        "roc_auc": 0.6556062186256396,
+        "pr_auc": 0.5012240127236757,
+        "support_positive": 10725,
+        "support_total": 29828
+      },
+      "Wasting": {
+        "accuracy": 0.8109494434759287,
+        "precision": 0.0,
+        "recall_sensitivity": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "roc_auc": 0.600592194657062,
+        "pr_auc": 0.2524790662589538,
+        "support_positive": 5639,
+        "support_total": 29828
+      },
+      "Malnutrition": {
+        "accuracy": 0.6041973984175942,
+        "precision": 0.6197872175196086,
+        "recall_sensitivity": 0.5359613189174669,
+        "specificity": 0.6722233380196827,
+        "f1": 0.5748343416882743,
+        "roc_auc": 0.6473922505054213,
+        "pr_auc": 0.6320907096581307,
+        "support_positive": 14891,
+        "support_total": 29828
+      }
+    },
+    "confusion_matrices": {
+      "Stunting": [
+        [
+          16897,
+          2206
+        ],
+        [
+          7989,
+          2736
+        ]
+      ],
+      "Wasting": [
+        [
+          24189,
+          0
+        ],
+        [
+          5639,
+          0
+        ]
+      ],
+      "Malnutrition": [
+        [
+          10041,
+          4896
+        ],
+        [
+          6910,
+          7981
+        ]
+      ]
+    }
+  },
+  "training_seconds": 108.61641597747803,
+  "evaluated_at_utc": "2026-10-09T16:49:11.964655+00:00",
+  "note": "Training metrics are not held-out performance. Test metrics were computed once after model selection."
+}

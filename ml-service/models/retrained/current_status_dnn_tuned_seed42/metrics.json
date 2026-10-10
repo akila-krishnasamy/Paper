@@ -1,0 +1,68 @@
+{
+  "task": "current nutritional status",
+  "model": "tuned PyTorch DNN",
+  "not_comparable_to": "early-risk prediction",
+  "dataset_sha256": "ee9443fa3123b9039527a8d208c4108757227a84f2643732b08cc01feceb6c34",
+  "features": [
+    "age",
+    "sex",
+    "weight",
+    "height",
+    "measurement_status",
+    "BMI_like",
+    "age_interactions"
+  ],
+  "excluded_target_variables": [
+    "hw70",
+    "hw72"
+  ],
+  "split": {
+    "train": 139169,
+    "validation": 29910,
+    "test": 29760
+  },
+  "thresholds_selected_on_validation": [
+    0.6899999999999997,
+    0.7599999999999997
+  ],
+  "test_exact_match_accuracy": 0.9743279569892473,
+  "test_macro_f1": 0.9770469020155557,
+  "per_target_accuracy": {
+    "Stunting": 0.9832661290322581,
+    "Wasting": 0.9908602150537634,
+    "Malnutrition": 0.9794690860215054
+  },
+  "confusion_matrices": {
+    "Stunting": [
+      [
+        18863,
+        193
+      ],
+      [
+        305,
+        10399
+      ]
+    ],
+    "Wasting": [
+      [
+        24117,
+        154
+      ],
+      [
+        118,
+        5371
+      ]
+    ],
+    "Malnutrition": [
+      [
+        14752,
+        277
+      ],
+      [
+        334,
+        14397
+      ]
+    ]
+  },
+  "training_seconds": 782.7164402008057
+}

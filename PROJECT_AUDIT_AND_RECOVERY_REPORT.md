@@ -24,10 +24,11 @@
    - In the React UI (`frontend/src/components/ResultsDashboard.jsx`, lines 589–603), **"Acute Lower Respiratory (ALRI)"** is displayed as a hardcoded rule-based warning card (`childInfo?.cough_recent === 'Yes' || childInfo?.fever_recent === 'Yes' ? 'Active Warning' : 'Low Active Risk'`), not a trained model output.
    - However, `data/raw/IAKR7EFL.DTA` **does** contain the full NFHS-5 ARI variables: `h31` (cough in last 2 weeks), `h31b` (short, rapid breaths), and `h31c` (problem in chest vs. blocked/running nose), with **10,635 broad ARI cases (5.35%)** and **4,707 strict chest-ARI cases (2.37%)** inside the 198,849 cohort.
 
-4. **Critical Scientific Audit Finding — Manually Fabricated Metrics in JSON Files (`bd55bd7`):**
+4. **Critical Scientific Audit Finding — Inconsistent Metric Values Introduced in JSON Files (`bd55bd7`):**
    - When the 4 NFHS-5 models (`XGBoost`, `DNN`, `FT-Transformer`, `TabNet`) were actually trained on `dhs_clean.parquet` (commit `bf3ca51`), their **true held-out test accuracies** on the 29,828 test records were **52.77%–55.59% for Stunting**, **45.30%–63.37% for Wasting**, and **53.51%–55.26% for Composite Malnutrition** (with ROC-AUC **0.5961–0.6596**).
-   - In commit `bd55bd7`, someone **manually edited** `dnn_metrics.json`, `xgboost_metrics.json`, `transformer_metrics.json`, `tabnet_metrics.json`, and `all_models_benchmark.json` to overwrite `accuracy` (`0.9080–0.9560`), `f1_score` (`0.9015–0.9475`), and `roc_auc` (`0.9140–0.9610`), while leaving `precision` (`0.2198–0.5296`), `recall_sensitivity`, `specificity` (`0.1088–0.6725`), `val_f1` (`0.3183–0.6747`), and `confusion_matrices` untouched!
-   - Re-evaluating the actual saved model weights (`best_dnn.pt`, `xgboost_multilabel.pkl`, `best_transformer.pt`, `tabnet_model.zip`) on the exact 29,828 test split reproduces the saved confusion matrices to the exact integer and confirms the true performance is **~53–63% accuracy / ~0.60–0.66 ROC-AUC**, **not** 91–95%.
+   - The Git diff for `bd55bd7` shows that `dnn_metrics.json`, `xgboost_metrics.json`, `transformer_metrics.json`, `tabnet_metrics.json`, and `all_models_benchmark.json` changed their `accuracy` (`0.9080–0.9560`), `f1_score` (`0.9015–0.9475`), and `roc_auc` (`0.9140–0.9610`) values, while the `precision` (`0.2198–0.5296`), `recall_sensitivity`, `specificity` (`0.1088–0.6725`), `val_f1` (`0.3183–0.6747`), and `confusion_matrices` remained inconsistent. The available Git evidence establishes the inconsistency and commit provenance, but does not establish which person made the edits.
+   - Re-evaluating the actual saved **early-risk** model weights (`best_dnn.pt`, `xgboost_multilabel.pkl`, `best_transformer.pt`, `tabnet_model.zip`) on the exact 29,828-record test split reproduces the saved confusion matrices to the exact integer and confirms the true per-target performance is **~45–63% accuracy / ~0.60–0.66 ROC-AUC**, **not** 91–95%. These models do not use contemporaneous child height/length and weight.
+   - Later, separate **current-status** models were evaluated using NFHS-5 child measurements (`hw2` weight and `hw3` height/length), while excluding the target z-scores (`hw70`, `hw72`) from the inputs. They achieved **97.43% total accuracy for the tuned DNN** and **98.48% total accuracy for XGBoost** on their own group-aware test split. These results are valid for current-status classification, but are not results for the original early-risk task.
 
 ---
 
@@ -156,7 +157,7 @@ e:\SEM-7\paper_\
 | **4. Iron Deficiency & Anemia (`Result` in External Lab Pipeline)** | `Result` column in `data/raw/anemia_public.csv` (NOT NFHS-5; `hw57` in `IAKR7EFL.DTA` was unused) | `y = df["Result"]` (`ml-service/training/train_anemia.py` L28); in `anemia_public.csv`, `Result=1` iff `Hemoglobin < 12.0` (Female `Gender=0`) or `Hemoglobin < 13.5` (Male `Gender=1`) | `XGBClassifier` (`ml-service/models/anemia/anemia_model.pkl`) | Test Acc `100.0%` (`60/60`), F1 `1.0`, AUC `1.0` on 60 test rows of `anemia_public.csv` — **invalid due to direct target leakage (`Hemoglobin` is a predictor) and adult male/female cutoffs.** | **Replaced NFHS-5 Anaemia with non-NFHS adult lab dataset containing target leakage** |
 | **5. Stunting, Wasting, Malnutrition (External Anthropometric Pipeline)** | `Stunting`, `Wasting` in `stunting_wasting_dataset.csv` (Indonesian 100k dataset) | `df["Stunting"] = df["Stunting"].isin(["Stunted", "Severely Stunted"]).astype(int)`<br>`df["Wasting"] = df["Wasting"].isin(["Underweight", "Severely Underweight"]).astype(int)`<br>`df["Malnutrition"] = ((df["Stunting"] == 1) \| (df["Wasting"] == 1)).astype(int)` (`train_anthropometric.py` L27–29) | 3 `XGBClassifier` pipelines saved in `ml-service/models/anthropometric/model.pkl` | Test Acc on 20,000 rows:<br>• Stunting: `99.80%`<br>• Wasting: `100.00%`<br>• Malnutrition: `99.84%`<br>*(Uses height & weight directly to memorize WHO lookup table)* | **Implemented on non-NFHS Indonesian dataset (memorizes height/weight Z-score lookup)** |
 | **6. Vitamin A Deficiency Risk** | No dataset variable (rule-based inference only) | `vit_a_risk = 0.75 if (dd < 3 and measles) else (0.55 if dd < 3 or (measles and diarrhea) else 0.18)` (`ml-service/inference/deficiency_predict.py` L89) | **None** (Hardcoded if/else heuristic) | None (No training or evaluation) | **Rule-based heuristic only (No ML model)** |
-| **7. Acute Respiratory Infection (ARI / ALRI)** | `h31`, `h31b`, `h31c` exist in `IAKR7EFL.DTA`, but only `h31` (`cough_recent`) is in `dhs_clean.parquet` as an **input feature** | Frontend-only rule in `ResultsDashboard.jsx` L593–595: `childInfo?.cough_recent === 'Yes' ? 'Active Warning' : 'Low Active Risk'` | **None** | None | **Not implemented as a prediction target (`cough_recent` is an input predictor)** |
+| **7. Acute Respiratory Infection (ARI / ALRI)** | `h31`, `h31b`, `h31c` in `IAKR7EFL.DTA` | Strict target: `h31 == 2 AND h31b == 1 AND h31c in {1,3}`; unknown and structurally missing follow-up responses are excluded | XGBoost, DNN, numeric FT-Transformer in `ml-service/models/nfhs_health_targets/ari/seed42/` | Test accuracy `97.70%`, but sensitivity `0%` and 0/772 positive cases detected; accuracy equals the majority baseline | **Implemented in the new NFHS-5 pipeline, but not clinically useful yet; do not report 97.70% as successful ARI detection** |
 
 ### Detailed Target Specifications Required by Phase 2
 
@@ -164,6 +165,8 @@ e:\SEM-7\paper_\
    - **3 multi-label targets** in the NFHS-5 4-model suite (`"Stunting"`, `"Wasting"`, `"Malnutrition"`).
    - **3 single-target models** in the Indonesian Anthropometric suite (`"Stunting"`, `"Wasting"`, `"Malnutrition"`).
    - **1 binary target** in the external CBC Anemia model (`"Result"` / Anemia).
+   - **1 NFHS-5 anemia target** from `hw57`.
+   - **1 NFHS-5 ARI target** from `h31`, `h31b`, and `h31c`.
    - *(Plus 1 rule-based heuristic for Vitamin A risk and 2 frontend symptom badges for ALRI and Dysentery).*
 2. **Number of classes & task type for each target:**
    - Every implemented ML target (`Stunting`, `Wasting`, `Malnutrition`, and `Result`/Anemia) is **binary classification (2 classes: `0` and `1`)**. None are multiclass or regression.
@@ -349,3 +352,177 @@ Before modifying any code or retraining any models, we recommend deciding on the
    - Fix the `"No Education"` `.capitalize()` bug in `ml-service/preprocessing/preprocessing.py` (line 214) and `ml-service/app.py` (line 110).
    - Fix the threshold calibration in `train_dnn.py` and `train_transformer.py` so `pos_weight` and low probability thresholds (`0.20–0.35`) do not collapse test specificity to 11%–18%.
    - Fix the standalone lab anemia check in `deficiency_predict.py` so a child with $\text{Hb} \ge 11.0\text{ g/dL}$ is never flagged as high-risk anemic due to adult male cutoffs (`13.5 g/dL`) from `anemia_public.csv`.
+
+---
+
+## 9. Verified Recovery Experiments (October 10, 2026)
+
+Subsequent controlled experiments were run without overwriting the historical
+weights or metric JSON files. The experiments distinguish the original
+**early-risk prediction task** from a separate **current nutritional-status
+classification task**.
+
+### 9.1 Data-quality findings
+
+The processed NFHS-5 dataset is
+`data/processed/dhs_clean.parquet` with 198,849 rows and 33 columns.
+
+- SHA-256: `4215d66720c761695eb7f029962c4ebb5d0df5cf40c336a8fc0bc9e803a04abf`
+- Exact duplicate rows: `0`
+- Unique `caseid` values: `157,674`
+- Records belonging to repeated `caseid` groups: `79,312`
+- Stunting and wasting labels are binary and valid.
+- Composite consistency is 100%:
+  `Malnutrition = Stunting OR Wasting`.
+- Missingness is concentrated in `measles_vaccine`, `anc_visits`,
+  `breastfeeding_duration`, and `birth_weight`.
+
+Because repeated `caseid` values represent related records, a random row split
+can place related records in both training and test sets. A group-aware
+`caseid` sensitivity analysis is therefore required for generalization claims.
+The generated audit is available in
+`ml-service/reports/DATA_QUALITY_AUDIT.md` and
+`ml-service/reports/data_quality_audit.json`.
+
+### 9.2 Early-risk task results
+
+The early-risk task excludes contemporaneous child height/length and weight.
+The best verified result is:
+
+| Experiment | Test exact-match accuracy |
+|---|---:|
+| Majority baseline | 50.08% |
+| Composite-consistent DNN | 52.62% |
+| Tuned random-split XGBoost | 49.79% |
+| Rich-feature, `caseid`-grouped XGBoost | **54.23%** |
+
+The best group-aware XGBoost per-target accuracies were:
+
+- Stunting: 67.58%
+- Wasting: 81.63%
+- Composite malnutrition: 57.97%
+
+This result is saved in
+`ml-service/models/retrained/xgboost_group_aware_seed42/metrics.json`.
+It does not support a 97% early-risk accuracy claim.
+
+### 9.3 Current nutritional-status task
+
+The raw NFHS-5 file contains contemporaneous anthropometric measurements:
+
+- `hw2`: child weight
+- `hw3`: child height/length
+- `hw1`: child age
+- `b4`: child sex
+- `hw5` and `hw8`: measurement-status fields
+
+A separate current-status XGBoost experiment used those measurements but
+excluded the target-defining z-scores `hw70` and `hw72` from the features. It
+used a group-aware split and selected thresholds on validation data only.
+
+Verified results:
+
+| Outcome | Test accuracy |
+|---|---:|
+| Stunting | 99.27% |
+| Wasting | 99.18% |
+| Composite malnutrition | 98.89% |
+| Total exact-match accuracy | **98.48%** |
+
+The saved model was reloaded and reproduced the recorded total accuracy exactly.
+Artifacts:
+
+- `ml-service/models/retrained/current_status_xgboost_seed42/model.pkl`
+- `ml-service/models/retrained/current_status_xgboost_seed42/metrics.json`
+- `ml-service/training/current_status_experiment.py`
+
+This is not an early-risk model. It is a current-status classifier and must be
+reported as a separate task.
+
+### 9.4 DNN status
+
+The early-risk DNN remains at **52.62% held-out exact-match accuracy** in the
+composite-consistent run. Its artifact is:
+
+`ml-service/models/retrained/dnn_retrained_consistent_seed42/metrics.json`
+
+A separate current-status PyTorch DNN was trained using the same six
+measurement-time features as the current-status XGBoost experiment:
+
+- Current-status total exact-match accuracy: **98.03%**
+- Stunting accuracy: **98.81%**
+- Wasting accuracy: **98.90%**
+- Composite malnutrition accuracy: **98.94%**
+- Test records: **29,760**
+- Macro F1: **0.9811**
+
+The current-status DNN artifact is:
+
+`ml-service/models/retrained/current_status_dnn_seed42/metrics.json`
+
+The training implementation is:
+
+`ml-service/training/current_status_dnn.py`. It uses the same current-status
+feature definition as the current-status XGBoost experiment. Its results must
+not be merged with the early-risk DNN metrics.
+
+### 9.5 Final scientific conclusion
+
+The project has two valid but different prediction tasks:
+
+1. **Early-risk prediction:** uses pre-outcome socioeconomic, maternal, birth,
+   household, sanitation, and morbidity variables. Best verified total
+   accuracy: 54.23% under group-aware evaluation.
+2. **Current nutritional-status classification:** uses measured child
+   height/length and weight. Verified total accuracy: 98.48%.
+
+The 98.48% result must not be presented as the accuracy of the early-risk DNN,
+and the two tasks must not share a benchmark table without explicit task labels.
+The 97% target is achievable for the current-status task in this experiment but
+was not achieved for the original early-risk task.
+
+---
+
+## 10. Current Verified Accuracy Snapshot
+
+The latest saved prediction-based metrics are:
+
+| Task and model | Stunting | Wasting | Composite | Total exact-match |
+|---|---:|---:|---:|---:|
+| Early-risk DNN | 65.26% | 81.09% | 58.41% | **52.62%** |
+| Early-risk group-aware XGBoost | 67.58% | 81.63% | 57.97% | **54.23%** |
+| Current-status DNN | 98.81% | 98.90% | 98.94% | **98.03%** |
+| Current-status XGBoost | 99.27% | 99.18% | 98.89% | **98.48%** |
+
+The early-risk DNN values come from
+`ml-service/models/retrained/dnn_retrained_consistent_seed42/metrics.json`.
+The early-risk group-aware XGBoost values come from
+`ml-service/models/retrained/xgboost_group_aware_seed42/metrics.json`.
+The current-status DNN values come from
+`ml-service/models/retrained/current_status_dnn_seed42/metrics.json`.
+The current-status XGBoost values come from
+`ml-service/models/retrained/current_status_xgboost_seed42/metrics.json`.
+
+The current-status DNN and XGBoost use the same NFHS-5 source outcome
+definitions but include contemporaneous child weight and height/length. The
+early-risk models do not. Therefore, the current-status values must not replace
+the separate NFHS-5 anemia and ARI results. Those targets are now implemented
+from the raw Kids Recode file by
+`ml-service/training/train_nfhs_health_targets.py`.
+
+### NFHS-5 anemia and ARI locations
+
+| Target | Raw source | Definition | Eligible records | Best/current DNN test accuracy | Artifact |
+|---|---|---|---:|---:|---|
+| Anemia | `hw57` in `data/raw/IAKR7EFL.DTA` | `1,2,3 = anemia`; `4 = not anemia`; unknown values excluded | 183,855 | **67.20%** | `ml-service/models/nfhs_health_targets/anemia/seed42/metrics.json` |
+| ARI | `h31`, `h31b`, `h31c` in `data/raw/IAKR7EFL.DTA` | `h31=2 AND h31b=1 AND h31c in {1,3}`; unknown responses excluded | 223,647 | **97.70%** | `ml-service/models/nfhs_health_targets/ari/seed42/metrics.json` |
+
+The ARI DNN accuracy equals the 97.70% majority-class baseline: it detected
+zero of 772 positive ARI cases in the test set. It is therefore not evidence
+of a useful ARI classifier and must be reported with sensitivity `0%`.
+
+The new models use non-target demographic, household, and maternal predictors;
+`hw57`, `h31`, `h31b`, and `h31c` are excluded from the features. The complete
+prediction-derived metrics, confusion matrices, thresholds, split counts, and
+dataset fingerprint are in the two `metrics.json` files above.
+or be merged into the early-risk benchmark.

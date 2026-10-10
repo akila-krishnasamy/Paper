@@ -1,0 +1,107 @@
+{
+  "model": "group-aware XGBoost",
+  "seed": 42,
+  "group_column": "caseid",
+  "split_sizes": {
+    "train": 139353,
+    "validation": 29818,
+    "test": 29678
+  },
+  "thresholds_selected_on_validation": [
+    0.5200000000000001,
+    0.5000000000000001
+  ],
+  "test_exact_match_accuracy": 0.5422535211267606,
+  "test_macro_f1": 0.25453533803641787,
+  "test_macro_roc_auc": 0.6504396064567222,
+  "per_target": {
+    "Stunting": {
+      "accuracy": 0.6758204730777007,
+      "balanced_accuracy": 0.590978008483708,
+      "precision": 0.6020686963309914,
+      "recall": 0.2892097121964939,
+      "f1": 0.39072889620670004,
+      "roc_auc": 0.6797906771070655,
+      "pr_auc": 0.5421273834374656
+    },
+    "Wasting": {
+      "accuracy": 0.8163285935709953,
+      "balanced_accuracy": 0.5003238904205121,
+      "precision": 0.35294117647058826,
+      "recall": 0.0011017260374586854,
+      "f1": 0.002196595277320154,
+      "roc_auc": 0.6059051089498781,
+      "pr_auc": 0.2490542663034931
+    },
+    "Malnutrition": {
+      "accuracy": 0.5796549632724577,
+      "balanced_accuracy": 0.5764868484157286,
+      "precision": 0.7164586583463338,
+      "recall": 0.2500170125893161,
+      "f1": 0.3706805226252333,
+      "roc_auc": 0.6656230333132228,
+      "pr_auc": 0.6529808332084888
+    }
+  },
+  "confusion_matrices": {
+    "Stunting": [
+      [
+        16972,
+        2039
+      ],
+      [
+        7582,
+        3085
+      ]
+    ],
+    "Wasting": [
+      [
+        24221,
+        11
+      ],
+      [
+        5440,
+        6
+      ]
+    ],
+    "Malnutrition": [
+      [
+        13529,
+        1454
+      ],
+      [
+        11021,
+        3674
+      ]
+    ]
+  },
+  "features": [
+    "age_hh_head_proxy",
+    "hhsize",
+    "wealth_quintile",
+    "wealth_score",
+    "residence",
+    "gender_hh_head",
+    "dist_market_proxy",
+    "child_age_months",
+    "child_sex",
+    "birth_order",
+    "birth_size",
+    "birth_weight",
+    "birth_weight_source",
+    "breastfeeding_duration",
+    "measles_vaccine",
+    "diarrhea_recent",
+    "fever_recent",
+    "cough_recent",
+    "mother_weight",
+    "mother_height",
+    "mother_bmi",
+    "mother_marital_status",
+    "anc_visits",
+    "water_source",
+    "toilet_type",
+    "cooking_fuel"
+  ],
+  "training_seconds": 20.28659439086914
+}

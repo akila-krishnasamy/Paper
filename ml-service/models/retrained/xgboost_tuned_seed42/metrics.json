@@ -1,0 +1,85 @@
+{
+  "model": "xgboost_tuned",
+  "seed": 42,
+  "split": {
+    "train": 139194,
+    "validation": 29827,
+    "test": 29828
+  },
+  "validation_thresholds": {
+    "Stunting": 0.5200000000000001,
+    "Wasting": 0.4,
+    "Malnutrition": 0.6400000000000001
+  },
+  "validation_exact_match_accuracy": 0.5010896167901566,
+  "test_exact_match_accuracy": 0.49792141611908275,
+  "test_hamming_accuracy": 0.676322024048992,
+  "test_macro_f1": 0.22173697097976897,
+  "test_weighted_f1": 0.2671624494840823,
+  "test_macro_precision": 0.5575884533830019,
+  "test_macro_recall": 0.14699222285951835,
+  "test_macro_roc_auc": 0.6378322145193319,
+  "test_macro_pr_auc": 0.46361180810969804,
+  "per_target": {
+    "Stunting": {
+      "accuracy": 0.6597827544588977,
+      "balanced_accuracy": 0.5612901865448586,
+      "precision": 0.5732047703628521,
+      "recall": 0.21062937062937062,
+      "f1": 0.3080594572480567,
+      "roc_auc": 0.6600715761580547,
+      "pr_auc": 0.5039759168402204
+    },
+    "Wasting": {
+      "accuracy": 0.8097089982566715,
+      "balanced_accuracy": 0.5050829875222075,
+      "precision": 0.41148325358851673,
+      "recall": 0.015250931016137613,
+      "f1": 0.029411764705882353,
+      "roc_auc": 0.6055711842627028,
+      "pr_auc": 0.2554084530551819
+    },
+    "Malnutrition": {
+      "accuracy": 0.5594743194314067,
+      "balanced_accuracy": 0.5589440460895401,
+      "precision": 0.688077336197637,
+      "recall": 0.21509636693304682,
+      "f1": 0.32773969098536787,
+      "roc_auc": 0.647853883137238,
+      "pr_auc": 0.631451054433692
+    }
+  },
+  "confusion_matrices": {
+    "Stunting": [
+      [
+        17421,
+        1682
+      ],
+      [
+        8466,
+        2259
+      ]
+    ],
+    "Wasting": [
+      [
+        24066,
+        123
+      ],
+      [
+        5553,
+        86
+      ]
+    ],
+    "Malnutrition": [
+      [
+        13485,
+        1452
+      ],
+      [
+        11688,
+        3203
+      ]
+    ]
+  },
+  "training_seconds": 41.45106649398804
+}
