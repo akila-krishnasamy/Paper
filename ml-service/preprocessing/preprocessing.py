@@ -5,14 +5,11 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit, train_test_split
 
-# Core Target Conditions
-TARGET_CONDITIONS = [
-    "Stunting",
-    "Wasting",
-    "Malnutrition"
-]
+# The supported nutrition model outputs are separate conditions. Historical
+# model checkpoints may contain an additional composite output; it is not served.
+TARGET_CONDITIONS = ["Stunting", "Wasting"]
 
 # Numerical Features
 NUMERICAL_FEATURES = [
@@ -41,6 +38,19 @@ CATEGORICAL_FEATURES = [
 ]
 
 ALL_FEATURES = NUMERICAL_FEATURES + CATEGORICAL_FEATURES
+
+
+def normalize_choice(value, valid_values, default=None):
+    """Normalize mixed-case / numeric category inputs to the canonical training labels."""
+    if value is None:
+        return default
+
+    text = str(value).strip()
+    lowered = text.casefold()
+    for valid in valid_values:
+        if lowered == str(valid).casefold():
+            return valid
+    return default
 
 
 def get_project_root():
@@ -113,10 +123,10 @@ def load_and_preprocess_dhs_data(data_path="dhs_clean.parquet"):
     df["maternal_risk_score"] = mother_underweight + low_anc + low_bw
 
     # Targets
-    df["Stunting"] = df["stunting"].astype(int)
-    df["Wasting"] = df["wasting"].astype(int)
-    df["Malnutrition"] = (df["stunting"] | df["wasting"]).astype(int)
-
+    col_stunting = "stunting" if "stunting" in df.columns else "Stunting"
+    col_wasting = "wasting" if "wasting" in df.columns else "Wasting"
+    df["Stunting"] = df[col_stunting].astype("Int64")
+    df["Wasting"] = df[col_wasting].astype("Int64")
     return df
 
 
@@ -210,24 +220,21 @@ class DataPreprocessor:
         data["child_sex"] = "Female" if str(c_sex).lower() in ["female", "f", "girl", "2"] else "Male"
 
         # Education
-        edu = input_dict.get("education", "Secondary")
-        edu_str = str(edu).capitalize()
         valid_edus = ["No Education", "Primary", "Secondary", "Higher"]
-        data["education"] = edu_str if edu_str in valid_edus else "Secondary"
+        data["education"] = normalize_choice(input_dict.get("education", "Secondary"), valid_edus, "Secondary")
 
         # Wealth Quintile
-        wq = input_dict.get("wealth_quintile", "Middle")
         valid_wq = ["Poorest", "Poorer", "Middle", "Richer", "Richest"]
-        data["wealth_quintile"] = wq if wq in valid_wq else "Middle"
+        data["wealth_quintile"] = normalize_choice(input_dict.get("wealth_quintile", "Middle"), valid_wq, "Middle")
 
         # Residence
         res = input_dict.get("residence", "Rural")
-        data["residence"] = "Urban" if str(res).lower() in ["urban", "1", "city"] else "Rural"
+        res_text = str(res).strip()
+        data["residence"] = "Urban" if res_text.casefold() in ["urban", "1", "city"] else "Rural"
 
         # Birth Size
-        bs = input_dict.get("birth_size", "Average")
         valid_bs = ["Very Large", "Larger than Average", "Average", "Smaller than Average", "Very Small"]
-        data["birth_size"] = bs if bs in valid_bs else "Average"
+        data["birth_size"] = normalize_choice(input_dict.get("birth_size", "Average"), valid_bs, "Average")
 
         # Morbidity symptoms
         def parse_yes_no(val, default="No"):
@@ -255,19 +262,52 @@ def prepare_data_splits(data_path="dhs_clean.parquet", test_size=0.15, val_size=
     df = load_and_preprocess_dhs_data(data_path)
     print(f"Loaded {len(df):,} records with {len(ALL_FEATURES)} predictors and {len(TARGET_CONDITIONS)} targets.")
 
+    df = df.dropna(subset=TARGET_CONDITIONS).copy()
     X = df[ALL_FEATURES]
-    Y = df[TARGET_CONDITIONS]
-
-    # Split Train (70%) vs Temp (30%)
-    X_train, X_temp, Y_train, Y_temp = train_test_split(
-        X, Y, test_size=(test_size + val_size), random_state=random_state, stratify=Y["Malnutrition"]
-    )
-
-    # Split Temp into Val (15%) and Test (15%)
-    val_ratio_in_temp = val_size / (test_size + val_size)
-    X_val, X_test, Y_val, Y_test = train_test_split(
-        X_temp, Y_temp, test_size=(1.0 - val_ratio_in_temp), random_state=random_state, stratify=Y_temp["Malnutrition"]
-    )
+    Y = df[TARGET_CONDITIONS].astype(int)
+    group_columns = [column for column in ("v001", "v002") if column in df]
+    if group_columns:
+        groups = (
+            df[group_columns].astype("string").fillna("<missing>")
+            .agg("|".join, axis=1).to_numpy()
+        )
+        indices = np.arange(len(df))
+        train_idx, remainder_idx = next(
+            GroupShuffleSplit(
+                n_splits=1,
+                test_size=test_size + val_size,
+                random_state=random_state,
+            ).split(indices, Y["Stunting"], groups)
+        )
+        val_relative, test_relative = next(
+            GroupShuffleSplit(
+                n_splits=1,
+                test_size=test_size / (test_size + val_size),
+                random_state=random_state,
+            ).split(
+                remainder_idx,
+                Y.iloc[remainder_idx]["Stunting"],
+                groups[remainder_idx],
+            )
+        )
+        val_idx = remainder_idx[val_relative]
+        test_idx = remainder_idx[test_relative]
+        X_train, X_val, X_test = (
+            X.iloc[train_idx], X.iloc[val_idx], X.iloc[test_idx]
+        )
+        Y_train, Y_val, Y_test = (
+            Y.iloc[train_idx], Y.iloc[val_idx], Y.iloc[test_idx]
+        )
+    else:
+        X_train, X_temp, Y_train, Y_temp = train_test_split(
+            X, Y, test_size=(test_size + val_size), random_state=random_state,
+            stratify=Y["Stunting"]
+        )
+        val_ratio_in_temp = val_size / (test_size + val_size)
+        X_val, X_test, Y_val, Y_test = train_test_split(
+            X_temp, Y_temp, test_size=(1.0 - val_ratio_in_temp),
+            random_state=random_state, stratify=Y_temp["Stunting"]
+        )
 
     print(f"Train split: {len(X_train):,} | Validation split: {len(X_val):,} | Test split: {len(X_test):,}")
 

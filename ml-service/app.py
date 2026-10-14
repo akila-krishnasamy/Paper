@@ -3,6 +3,7 @@ import sys
 import json
 from pathlib import Path
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from inference.transformer_predict import get_transformer_predictor
@@ -14,6 +15,8 @@ from inference.anthropometric_predict import predict_anthropometric
 from preprocessing.preprocessing import TARGET_CONDITIONS, ALL_FEATURES
 
 app = Flask(__name__)
+CORS(app)
+
 
 
 def find_model_dir():
@@ -437,9 +440,16 @@ def route_model_benchmark():
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("   4-MODEL AI MALNUTRITION PREDICTION ENGINE (Flask)")
+    print("   4-MODEL AI MALNUTRITION PREDICTION ENGINE")
     print("   Serving on: http://127.0.0.1:5005")
     print("   Models: XGBoost, FT-Transformer, DNN, TabNet")
     print("=" * 70)
-    app.run(host="127.0.0.1", port=5005, debug=False)
+    try:
+        from waitress import serve
+        print("   Production WSGI Server: Waitress (threads=6)")
+        print("   Ready to accept incoming requests.")
+        serve(app, host="127.0.0.1", port=5005, threads=6)
+    except ImportError:
+        app.run(host="127.0.0.1", port=5005, debug=False)
+
 

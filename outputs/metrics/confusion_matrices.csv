@@ -1,0 +1,13 @@
+target,model,sample_count,true_negative,false_positive,false_negative,true_positive,threshold,accuracy
+Stunting,DNN,29799,6968,12220,1789,8822,0.4,0.5299
+Stunting,TabNet,29799,8350,10838,2461,8150,0.3,0.5537
+Stunting,FT-Transformer,29799,7869,11319,2167,8444,0.4,0.5474
+Wasting,DNN,29799,9385,14826,1406,4182,0.45,0.4553
+Wasting,TabNet,29799,16371,7840,3074,2514,0.2,0.6337
+Wasting,FT-Transformer,29799,10649,13562,1794,3794,0.5,0.4847
+Anaemia,DNN,36771,7480,4598,10173,14520,0.5037,0.5983
+Anaemia,TabNet,36771,7653,4425,10528,14165,0.5071,0.5933
+Anaemia,FT-Transformer,36771,7628,4450,10531,14162,0.5184,0.5926
+ARI-related illness,DNN,44730,36625,7060,812,233,0.5657,0.824
+ARI-related illness,TabNet,44730,37845,5840,836,209,0.5347,0.8507
+ARI-related illness,FT-Transformer,44730,32492,11193,710,335,0.5239,0.7339
