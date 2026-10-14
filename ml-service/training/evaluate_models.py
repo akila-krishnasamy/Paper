@@ -4,8 +4,11 @@ import json
 from pathlib import Path
 import pandas as pd
 
+ML_SERVICE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ML_SERVICE_DIR))
+
 def generate_four_model_report():
-    models_dir = Path(__file__).resolve().parent.parent / "models"
+    models_dir = ML_SERVICE_DIR / "models"
 
     metrics_files = {
         "XGBoost": models_dir / "xgboost" / "xgboost_metrics.json",
@@ -77,7 +80,7 @@ def generate_four_model_report():
     comparison["best_model_reason"] = f"Highest test Calibrated Screening Accuracy ({best_acc * 100:.2f}%) and Macro ROC-AUC ({best_auc:.4f}) on 29,828 unseen test records."
 
     # Per-condition comparison
-    target_conditions = ["Stunting", "Wasting", "Malnutrition"]
+    target_conditions = ["Stunting", "Wasting"]
     for cond in target_conditions:
         comparison["per_condition_comparison"][cond] = {}
         for model_name, data in metrics.items():
@@ -103,6 +106,13 @@ def generate_four_model_report():
     print(df_table.to_string(index=False))
     print(f"\nLeading Model: {best_model} ({comparison['best_model_reason']})")
     print("======================================================================\n")
+
+    try:
+        from training.generate_research_figures import main as generate_figures
+        print("\n[Evaluation Pipeline] Generating research paper figures and metrics...")
+        generate_figures()
+    except Exception as e:
+        print(f"Note on research figure generation: {e}")
 
     return comparison
 
